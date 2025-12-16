@@ -1,87 +1,75 @@
-# 🔒 Cybersecurity Foundations Project: Firewall Management & Vulnerability Assessment
+# 🛡️ Local Host Vulnerability Scanning Guide
 
-This project repository documents two core cybersecurity exercises: hands-on firewall rule management and theoretical knowledge of vulnerability assessment and management principles.
+## 🎯 Project Overview
 
-## 1. 🛡️ Firewall Rule Management Exercise Documentation
-
-This section provides the necessary commands and procedures to complete a basic firewall rule management exercise using Windows Firewall or Linux (UFW).
-
-### 1.1. Exercise Objectives
-
-The goal is to practice listing, adding, testing, and removing firewall rules to control inbound traffic.
-
-| Step | Windows Firewall (PowerShell) | Linux (UFW) |
-| :--- | :--- | :--- |
-| **1. Open Tool** | `Get-NetFirewallRule -Direction Inbound` (To confirm tool access) | `sudo ufw status` |
-| **2. List Rules** | `Get-NetFirewallRule -Direction Inbound` | `sudo ufw status verbose` |
-| **3. Add Block Rule**| `New-NetFirewallRule -DisplayName "Block Telnet 23" -Direction Inbound -LocalPort 23 -Protocol TCP -Action Block` | `sudo ufw deny 23/tcp comment 'Block Telnet 23'` |
-| **4. Test Rule** | **(See Section 1.2)** | **(See Section 1.2)** |
-| **5. Allow SSH (Linux Only)** | N/A | `sudo ufw allow 22/tcp comment 'Allow SSH'` |
-| **6. Remove Block Rule**| `Remove-NetFirewallRule -DisplayName "Block Telnet 23"` | `sudo ufw delete deny 23/tcp` |
-| **7. Document Steps**| Document the PowerShell or GUI steps used. | Document the exact commands used. |
-| **8. Summarize Filtering**| A firewall filters traffic by inspecting network packet headers (IP, Port, Protocol) against ordered rules (policy), often using stateful inspection to track active connections.  | |
-
-### 1.2. Rule Testing (Step 4)
-
-The test is successful if the connection attempt fails, indicating the firewall blocked the traffic.
-
-| Tool | Command Example (Testing port 23 on the local machine) | Expected Success Output |
-| :--- | :--- | :--- |
-| **Windows (PowerShell)** | `Test-NetConnection -Port 23 -ComputerName localhost` | Output shows `TcpTestSucceeded : False` or times out. |
-| **Linux (Netcat)** | `nc -vz 127.0.0.1 23` | Output shows "Connection refused" or a timeout. |
+This guide documents the procedure for performing a basic, unauthenticated vulnerability assessment on a local machine using **Nessus Essentials**. The process follows the required 8-step workflow to identify, analyze, and document critical system weaknesses.
 
 ---
 
-## 2. 🧠 Vulnerability Management Fundamentals
+## 🛠️ Prerequisites
 
-This section answers foundational questions on vulnerability assessment and management, based on industry best practices and common security reporting.
+* **Vulnerability Scanner:** Nessus Essentials installed and operational.
+* **Target:** The local host operating system (`localhost` or local IP).
 
-### 2.1. What is Vulnerability Scanning?
+---
 
-Vulnerability scanning is an automated process of inspecting systems (networks, applications, and operating systems) against a database of **known security weaknesses** (CVEs). It produces a report detailing potential flaws to guide patching and remediation efforts.
+## 📋 Scan Execution (Steps 1–4)
 
-### 2.2. Difference Between Vulnerability Scanning and Penetration Testing
+This section covers the setup and execution of the vulnerability scan.
 
-| Feature | Vulnerability Scanning | Penetration Testing (Pen Testing) |
-| :--- | :--- | :--- |
-| **Goal** | Identify **known** weaknesses and inventory vulnerable assets. | Exploit identified vulnerabilities to assess **real-world impact** and system defense. |
-| **Methodology**| Automated, tool-driven, high-speed, and non-intrusive. | Manual, hands-on, highly intrusive, and goal-oriented. |
+### 1. Install OpenVAS or Nessus Essentials.
 
-### 2.3. Common Vulnerabilities in Personal Computers
+* **Status:** Nessus Essentials is verified as installed and running on the host system.
 
-Common risks on personal machines often include:
-* **Outdated Software:** Operating systems and applications with unpatched security flaws.
-* **Weak Passwords:** Easily guessable or reused credentials.
-* **Misconfigured Firewalls:** Default or incorrectly configured network security settings.
+### 2. Set up scan target as your local machine IP or localhost.
 
-### 2.4. How Do Scanners Detect Vulnerabilities?
+* **Template Selection:** Chosen the **Basic Network Scan** template for comprehensive coverage.
+* **Target Configuration:** Set the target to the loopback address: `127.0.0.1` (representing `localhost`).
 
-Scanners typically follow this process:
+### 3. Start a full vulnerability scan.
 
-1.  **Host Discovery:** Identifying active devices on the network.
-2.  **Service Fingerprinting:** Determining the exact version and configuration of running services (e.g., Apache HTTP Server version).
-3.  **Vulnerability Checks:** Comparing discovered versions/configurations against a database of known security flaws.
-4.  **Reporting:** Compiling results categorized by severity.
+* **Action:** Configuration was saved, and the scan was launched from the "My Scans" page.
+* **Scan Name:** `Test_scan` (or a similar descriptive name).
 
-### 2.5. What is CVSS?
+### 4. Wait for scan to complete (may take 30-60 mins).
 
-**CVSS** stands for **Common Vulnerability Scoring System**. It is an open, standardized method used to numerically rate the severity of software vulnerabilities on a scale from 0.0 (low) to 10.0 (high). 
+* **Monitoring:** The scan status is monitored on the "My Scans" page until it indicates **Completed**.
+* **Note:** General scan time for this type of assessment is typically between 30 and 60 minutes.
 
-### 2.6. How Often Should Vulnerability Scans Be Performed?
+---
 
-Scan frequency should be based on risk and compliance requirements:
-* **External/Internet-Facing Assets:** Weekly or Bi-weekly.
-* **Internal Network Assets:** Monthly.
-* **Critical Systems:** Quarterly (minimum compliance requirement).
+## 🔍 Analysis and Documentation (Steps 5–8)
 
-### 2.7. What is a False Positive in Vulnerability Scanning?
+Once the scan is complete, the following steps are required for analysis and final reporting.
 
-A **false positive** occurs when the scanner flags a weakness that does not actually exist or is not exploitable in the target system's context. This often happens if the scanner detects a vulnerable version number but fails to recognize that a security patch has been backported by the vendor.
+### 5. Review the report for vulnerabilities and severity.
 
-### 2.8. How Do You Prioritize Vulnerabilities?
+* **Access:** Navigate to the completed scan report in the Nessus interface.
+* **Review:** Examine the initial summary to note the distribution of vulnerabilities by severity (Critical, High, Medium, Low).
+* **Detail:** Use the **Vulnerabilities** tab to review the individual findings.
 
-Prioritization should focus on **Risk**, combining severity with asset context and exploitability. 
+### 6. Research simple fixes or mitigations for found vulnerabilities.
 
-1.  **Exploitability and Severity (HIGH Priority):** Address vulnerabilities with a high CVSS/VPR score *and* a known, active exploit in the wild.
-2.  **Asset Criticality:** Prioritize flaws on critical business assets (e.g., core databases, primary web servers).
-3.  **Mitigation Availability:** Fix simple configuration flaws or vulnerabilities with readily available, tested patches first.
+* **Guidance:** For each finding, consult the **Solution** section in the Nessus report, which recommends the specific patch, update, or configuration change needed.
+* **Remediation:** Research the specific steps necessary to apply the fix to the host operating system.
+
+### 7. Document the most critical vulnerabilities.
+
+A formal write-up must be created, prioritizing the most severe findings. For all **Critical** and **High** severity vulnerabilities, the documentation must include:
+
+* **Vulnerability Name:**
+* **Severity:** (Critical / High)
+* **Description/Impact:**
+* **Recommended Solution:** (As per Nessus report)
+
+### 8. Take screenshots of the scan results.
+
+Visual proof of the successful execution and findings is required for the final submission.
+
+* **Required Visuals:**
+    1.  Screenshot of the "My Scans" page showing the scan as **Completed**.
+    2.  Screenshot of the main **Summary** page, showing the severity bar chart breakdown.
+    3.  Screenshots of the detailed view of one or more **Critical/High** findings (including the Description and Solution).
+* **Reporting Alternative:** An exported PDF or HTML report from Nessus can be used to supplement or replace simple screenshots.
+
+---
